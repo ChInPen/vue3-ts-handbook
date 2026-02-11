@@ -44,7 +44,7 @@ export interface UserProfile {
 import { ref, type Ref } from "vue";
 
 export function useDataLoader<T>(apiCall: () => Promise<ApiResponse<T>>) {
-  // data 是裝載結果的籃子，loading 是轉圈圈狀態，error 是故障訊息
+  // data 裝載結果，loading 是轉圈圈狀態，error 是故障訊息
   const data = ref<T | null>(null) as Ref<T | null>;
   const loading = ref(false);
   const error = ref<string | null>(null);
@@ -74,7 +74,7 @@ export function useDataLoader<T>(apiCall: () => Promise<ApiResponse<T>>) {
  * 使用 Axios 進行網路請求，並將結果「裝進」ApiResponse 規範中
  */
 
-export const createUser: = async (
+export const createUser = async (
   newUser: Partial<UserProfile>,
 ): Promise<ApiResponse<UserProfile>> => {
   try {
@@ -100,5 +100,23 @@ export const createUser: = async (
  * 在組件層，我們透過一個「閉包 (Closure)」將資料封裝進 API 動作中
  */
 
+<script setup lang="ts">
+import {ref} from "vue"
+import {useDataLoader} from "./composables/useDataLoader"
+import {createUser type UserProfile} from "./api"
 
+const form = ref<Partial<UserProfile>>({
+  username: '',
+  email: ''
+});
+
+const apiData = useDataLoader( () => createUser(form.value) )
+const { data, loading, error, execute } = apiData
+const handleRegister = async () => {
+  await execute();
+  if (data.value) {
+    alert("註冊成功!");
+  }
+};
+</script>
 ```
